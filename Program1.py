@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request
 import pandas as pd
-import numpy as np
 import pickle as pkl
-import os
 
 app = Flask(__name__)
 
@@ -17,8 +15,8 @@ def CarPricePrediction():
 
     dataset = pd.read_csv("cleaned_Data8.csv")
 
-    companies = sorted(dataset["company"].unique())
-    names = sorted(dataset["name"].unique())
+    companies = sorted(dataset["company"].dropna().unique())
+    names = sorted(dataset["name"].dropna().unique())
 
     return render_template(
         "CarPricePrediction.html",
@@ -36,33 +34,31 @@ def CarPricePredictionResult():
     kms_driven = request.args.get("kms_driven")
     fuel_type = request.args.get("fuel_type")
 
-    model_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "LinearRegressionModel.pkl"
-    )
+    # Convert numeric inputs to the correct data types
+    try:
+        year = int(year)
+        kms_driven = int(kms_driven)
+    except (ValueError, TypeError):
+        return "Invalid year or kilometers driven value.", 400
 
-    with open(model_path, "rb") as file:
+    # Load trained ML pipeline
+    with open("LinearRegressionModel.pkl", "rb") as file:
         pipe = pkl.load(file)
 
-    columns = [
-        "name",
-        "company",
-        "year",
-        "kms_driven",
-        "fuel_type"
-    ]
+    # Create DataFrame directly with correct column names
+    myinput = pd.DataFrame({
+        "name": [name],
+        "company": [company],
+        "year": [year],
+        "kms_driven": [kms_driven],
+        "fuel_type": [fuel_type]
+    })
 
-    data = np.array(
-        [name, company, year, kms_driven, fuel_type],
-        dtype=object
-    ).reshape(1, 5)
-
-    myinput = pd.DataFrame(
-        columns=columns,
-        data=data
-    )
-
+    # Make prediction
     result = pipe.predict(myinput)
+
+    # Convert NumPy result to normal Python number
+    predicted_price = float(result[0])
 
     return render_template(
         "CarPricePredictionResult.html",
@@ -71,7 +67,7 @@ def CarPricePredictionResult():
         year=year,
         kms_driven=kms_driven,
         fuel_type=fuel_type,
-        result=result
+        result=predicted_price
     )
 
 

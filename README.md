@@ -79,10 +79,10 @@ python Program1.py
 # 3. Open in browser
 http://127.0.0.1:5000/
 
+```
 ## 🌐 Live Deployment
 
 > 🚀 **Live Demo:** [🚗 Car Price Prediction](https://car-price-prediction-kor3.onrender.com)
-```
 
 ## 🚀 Future Work
 - Try non-linear models (Random Forest, XGBoost) for better accuracy

@@ -34,18 +34,19 @@ def CarPricePredictionResult():
     kms_driven = request.args.get("kms_driven")
     fuel_type = request.args.get("fuel_type")
 
-    # Convert numeric inputs to the correct data types
+    # Convert numeric inputs from strings to integers
     try:
         year = int(year)
         kms_driven = int(kms_driven)
-    except (ValueError, TypeError):
+    except (TypeError, ValueError):
         return "Invalid year or kilometers driven value.", 400
 
-    # Load trained ML pipeline
+    # Load trained pipeline
     with open("LinearRegressionModel.pkl", "rb") as file:
         pipe = pkl.load(file)
 
-    # Create DataFrame directly with correct column names
+    # IMPORTANT:
+    # Create DataFrame directly instead of using np.array()
     myinput = pd.DataFrame({
         "name": [name],
         "company": [company],
@@ -57,7 +58,7 @@ def CarPricePredictionResult():
     # Make prediction
     result = pipe.predict(myinput)
 
-    # Convert NumPy result to normal Python number
+    # Get single prediction value
     predicted_price = float(result[0])
 
     return render_template(

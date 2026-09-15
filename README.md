@@ -43,7 +43,7 @@ Used car pricing varies a lot and is hard to estimate consistently by hand — i
 
 ## 🗂️ Project Directory Structure
 ```
-Car-Price-Prediction/
+car-price-prediction/
 ├── Program1.py                     # Flask app
 ├── cleaned_Data8.csv               # Dataset
 ├── LinearRegressionModel.pkl       # Trained model
